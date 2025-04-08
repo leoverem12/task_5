@@ -5,39 +5,42 @@ from fastapi.responses import JSONResponse, HTMLResponse
 import uvicorn
 import time
 
-from data import users
+from data import products_buyers
 
 app = FastAPI()
 time.time()
 SECRET = "shhh"
 
-@app.get("/users/", status_code=status.HTTP_200_OK)
-async def return_users(
+@app.get("/products_buyers/", status_code=status.HTTP_200_OK)
+async def return_products_buyers(
     Authorization: Optional[str] = Header(None, description="bearer token you"),
     Accept: Optional[str] = Header(None, description="data type")):
     if "json" in Accept and Authorization == f"Bearer {SECRET}":
-        return JSONResponse(content=users)
+        return JSONResponse(content=products_buyers)
     elif "html" in Accept and Authorization == f"bearer {SECRET}":
-        return HTMLResponse(content=f"<h1>{users}</h1>")
+        return HTMLResponse(content=f"<h1>{products_buyers}</h1>")
 
 
     return HTTPException(status_code=status.HTTP_403_FORBIDDEN)
 
+@app.delete("/products_buyers/remove_buyer/{Buyer_id}", status_code=status.HTTP_200_OK)
+async def remove_buyer(buyer_id: int):
+    return HTTPException(status_code=status.HTTP_200_OK, detail=f"Покупця під айді {buyer_id} видалено")
 
-@app.get("/users/name/", status_code=status.HTTP_200_OK)
-async def get_user_name(name: str = Query(..., description="Знайти коричстовуча")):
-    user = next((user for user in users if user["name"] == name), None)
+@app.get("/products_buyers/buyer_name/", status_code=status.HTTP_200_OK)
+async def get_user_name(name: str = Query(..., description="Знайти покупця")):
+    user = next((user for user in products_buyers if user["Buyer_name"] == name), None)
     if user:
         return JSONResponse(content=user)
     return HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
 
-@app.get("/users/{user_id}/")
-async def get_user(user_id: int = Path(..., description="User ID")):
-    user = next((user for user in users if user["id"] == user_id), None)
-    if user:
-        return JSONResponse(content=user)
-    return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Користувача з ID {user_id} не знайдено")
+@app.get("/products_buyers/{buyer_name}/")
+async def get_buyer(buyer_name: int = Path(..., description="Product Buyer ID")):
+    buyer = next((user for user in products_buyers if user["id"] == buyer_name), None)
+    if buyer:
+        return JSONResponse(content=buyer)
+    return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Користувача з ID {buyer_name} не знайдено")
 
 
 
