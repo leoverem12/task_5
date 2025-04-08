@@ -13,19 +13,22 @@ SECRET = "shhh"
 
 @app.get("/products_buyers/", status_code=status.HTTP_200_OK)
 async def return_products_buyers(
-    Authorization: Optional[str] = Header(None, description="bearer token you"),
+    Authorization: Optional[str] = Header(None, description="Bearer token you"),
     Accept: Optional[str] = Header(None, description="data type")):
     if "json" in Accept and Authorization == f"Bearer {SECRET}":
         return JSONResponse(content=products_buyers)
-    elif "html" in Accept and Authorization == f"bearer {SECRET}":
+    elif "html" in Accept and Authorization == f"Bearer {SECRET}":
         return HTMLResponse(content=f"<h1>{products_buyers}</h1>")
 
 
     return HTTPException(status_code=status.HTTP_403_FORBIDDEN)
 
-@app.delete("/products_buyers/remove_buyer/{Buyer_id}", status_code=status.HTTP_200_OK)
-async def remove_buyer(buyer_id: int):
-    return HTTPException(status_code=status.HTTP_200_OK, detail=f"Покупця під айді {buyer_id} видалено")
+@app.delete("/products_buyers/remove_buyer/", status_code=status.HTTP_200_OK)
+async def remove_buyer(buyer_name: int):
+    if buyer_name:
+        buyer = next((user for user in products_buyers if user["id"] == buyer_name), None).pop(buyer_name)
+        return HTTPException(status_code=status.HTTP_200_OK, detail=f"Покупця {buyer} видалено")
+    return HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
 @app.get("/products_buyers/buyer_name/", status_code=status.HTTP_200_OK)
 async def get_user_name(name: str = Query(..., description="Знайти покупця")):
