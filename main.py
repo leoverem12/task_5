@@ -26,7 +26,8 @@ async def return_products_buyers(
 @app.delete("/products_buyers/remove_buyer/", status_code=status.HTTP_200_OK)
 async def remove_buyer(buyer_name: int):
     if buyer_name:
-        buyer = next((user for user in products_buyers if user["id"] == buyer_name), None).pop(buyer_name)
+        buyer = next((user for user in products_buyers if user["id"] == buyer_name), None)
+        products_buyers.remove(buyer)
         return HTTPException(status_code=status.HTTP_200_OK, detail=f"Покупця {buyer} видалено")
     return HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
